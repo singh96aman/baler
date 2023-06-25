@@ -83,6 +83,7 @@ def perform_training(output_path, config, verbose: bool):
 
     if verbose:
         print("Training and testing sets normalized")
+        print("Dataset Dimensions - ", train_set_norm.shape)
 
     try:
         if config.data_dimension == 1:

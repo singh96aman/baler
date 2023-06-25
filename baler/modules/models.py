@@ -295,3 +295,108 @@ class Conv_AE(nn.Module):
         z = self.encode(x)
         out = self.decode(z)
         return out
+
+
+class Conv_AE_3D(nn.Module):
+    def __init__(self, n_features, z_dim, *args, **kwargs):
+        super(Conv_AE_3D, self).__init__(*args, **kwargs)
+
+        self.q_z_mid_dim = 100
+        self.q_z_output_dim = 4800000
+
+        # Encoder
+
+        # Conv Layers
+        self.q_z_conv = nn.Sequential(
+            nn.Conv3d(1, 8, kernel_size=(1, 1, 1), stride=(1), padding=(1)),
+            # nn.BatchNorm2d(8),
+            nn.ReLU(),
+            nn.Conv3d(8, 16, kernel_size=(3), stride=(1), padding=(1)),
+            # nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.Conv3d(16, 32, kernel_size=(3), stride=(1), padding=(0)),
+            # nn.BatchNorm2d(32),
+            nn.ReLU(),
+        )
+        # Flatten
+        self.flatten = nn.Flatten(start_dim=1)
+
+        # Linear layers
+        self.q_z_lin = nn.Sequential(
+            nn.Linear(self.q_z_output_dim, self.q_z_mid_dim),
+            nn.ReLU(),
+            # nn.BatchNorm1d(self.q_z_mid_dim),
+            nn.Linear(self.q_z_mid_dim, z_dim),
+            nn.ReLU(),
+        )
+
+        # Decoder
+
+        # Linear layers
+        self.p_x_lin = nn.Sequential(
+            nn.Linear(z_dim, self.q_z_mid_dim),
+            nn.ReLU(),
+            # nn.BatchNorm1d(self.q_z_mid_dim),
+            nn.Linear(self.q_z_mid_dim, self.q_z_output_dim),
+            nn.ReLU(),
+            # nn.BatchNorm1d(self.q_z_output_dim),
+        )
+
+        # Conv Layers
+        self.p_x_conv = nn.Sequential(
+            nn.ConvTranspose3d(32, 16, kernel_size=(3), stride=(1), padding=(0)),
+            nn.BatchNorm3d(16),
+            nn.ReLU(),
+            nn.ConvTranspose3d(16, 8, kernel_size=(3), stride=(1), padding=(1)),
+            nn.BatchNorm3d(8),
+            nn.ReLU(),
+            nn.ConvTranspose3d(8, 1, kernel_size=(1, 1, 1), stride=(1), padding=(1)),
+        )
+
+    def encode(self, x):
+        # Conv
+
+        # print("Start Encoding - ", x.shape)
+        out = self.q_z_conv(x)
+        # h1 = F.leaky_relu(
+        #     nn.Conv3d(1, 8, kernel_size=(2, 5, 10), stride=(1), padding=(1))(x)
+        # )
+        # print("3D Layer 1 - ", h1.shape)
+        # h2 = F.leaky_relu(
+        #     nn.Conv3d(8, 16, kernel_size=(3), stride=(1), padding=(1))(h1)
+        # )
+        # print("3D Layer 2 - ", h2.shape)
+        # h3 = F.leaky_relu(
+        #     nn.Conv3d(16, 32, kernel_size=(3), stride=(1), padding=(0))(h2)
+        # )
+        # print("3D Layer 3 - ", h3.shape)
+
+        # out = h3
+
+        # print("Encoding 3D Layer Done - ", out.shape)
+        # Flatten
+        out = self.flatten(out)
+        # Dense
+        out = self.q_z_lin(out)
+        return out
+
+    def decode(self, z):
+        # Dense
+
+        # print("Decoding 3D Layer start - ", z.shape)
+
+        out = self.p_x_lin(z)
+        # Unflatten
+        out = out.view(1, 32, 60, 50, 50)
+        # Conv transpose
+
+        # print("Decoding After Flattening - ", out.shape)
+        out = self.p_x_conv(out)
+        # print("Debugging dim- ", out.shape)
+
+        return out
+
+    def forward(self, x):
+        z = self.encode(x)
+        out = self.decode(z)
+        return out
