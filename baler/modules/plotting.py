@@ -265,8 +265,6 @@ def plot_2D(project_path, config):
     else:
         num_tiles = 1
 
-    print("Here - ", data.shape, data_decompressed.shape)
-
     if config.model_type == "convolutional" and config.model_name == "Conv_AE_3D":
         data_decompressed = data_decompressed.reshape(
             (
@@ -276,8 +274,6 @@ def plot_2D(project_path, config):
                 data_decompressed.shape[4],
             )
         )
-
-    print(data.shape, data_decompressed.shape)
 
     print("=== Plotting ===")
     for ind in trange(num_tiles):
