@@ -3,7 +3,7 @@ def set_config(c):
     c.compression_ratio = 100
     # c.number_of_columns = 24
     # c.latent_space_size = 15
-    c.epochs = 500
+    c.epochs = 1000
     c.early_stopping = True
     c.early_stopping_patience = 100
     c.min_delta = 0
@@ -25,6 +25,7 @@ def set_config(c):
     c.intermittent_saving_patience = 100
     c.activation_extraction = False
     c.deterministic_algorithm = False
+    c.compress_latent_space = True
 
 
 # def set_config(c):

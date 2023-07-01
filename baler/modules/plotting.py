@@ -271,7 +271,7 @@ def plot_2D(project_path, config):
         data_decompressed = data_decompressed.reshape(
             (
                 data_decompressed.shape[2],
-                data_decompressed.shape[0],
+                1,
                 data_decompressed.shape[3],
                 data_decompressed.shape[4],
             )

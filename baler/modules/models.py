@@ -301,8 +301,9 @@ class Conv_AE_3D(nn.Module):
     def __init__(self, n_features, z_dim, *args, **kwargs):
         super(Conv_AE_3D, self).__init__(*args, **kwargs)
 
-        self.q_z_mid_dim = 100
-        self.q_z_output_dim = 4800000
+        self.q_z_mid_dim = 2000
+        self.q_z_output_dim = 75000  # Please change this to
+        self.compress_latent_space = False
 
         # Encoder
 
@@ -356,43 +357,25 @@ class Conv_AE_3D(nn.Module):
     def encode(self, x):
         # Conv
 
-        # print("Start Encoding - ", x.shape)
         out = self.q_z_conv(x)
-        # h1 = F.leaky_relu(
-        #     nn.Conv3d(1, 8, kernel_size=(2, 5, 10), stride=(1), padding=(1))(x)
-        # )
-        # print("3D Layer 1 - ", h1.shape)
-        # h2 = F.leaky_relu(
-        #     nn.Conv3d(8, 16, kernel_size=(3), stride=(1), padding=(1))(h1)
-        # )
-        # print("3D Layer 2 - ", h2.shape)
-        # h3 = F.leaky_relu(
-        #     nn.Conv3d(16, 32, kernel_size=(3), stride=(1), padding=(0))(h2)
-        # )
-        # print("3D Layer 3 - ", h3.shape)
-
-        # out = h3
-
-        # print("Encoding 3D Layer Done - ", out.shape)
         # Flatten
         out = self.flatten(out)
-        # Dense
-        out = self.q_z_lin(out)
+
+        if self.compress_latent_space:
+            # Dense
+            out = self.q_z_lin(out)
+
         return out
 
-    def decode(self, z):
-        # Dense
-
-        # print("Decoding 3D Layer start - ", z.shape)
-
-        out = self.p_x_lin(z)
+    def decode(self, out):
         # Unflatten
         out = out.view(1, 32, 60, 50, 50)
-        # Conv transpose
 
-        # print("Decoding After Flattening - ", out.shape)
+        if self.compress_latent_space:
+            out = self.p_x_lin(out)
+
+        # Conv transpose
         out = self.p_x_conv(out)
-        # print("Debugging dim- ", out.shape)
 
         return out
 
@@ -400,3 +383,6 @@ class Conv_AE_3D(nn.Module):
         z = self.encode(x)
         out = self.decode(z)
         return out
+
+    def set_compress_latent_space(self, compress_latent_space):
+        self.compress_latent_space = compress_latent_space
