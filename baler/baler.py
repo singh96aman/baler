@@ -125,7 +125,7 @@ def perform_training(output_path, config, verbose: bool):
     model = model_object(n_features=number_of_columns, z_dim=config.latent_space_size)
     model.to(device)
 
-    if config.model_name == "Conv_AE_3D":
+    if config.model_name == "Conv_AE_3D" and "compress_latent_space" in config:
         model.set_compress_latent_space(config.compress_latent_space)
 
     if verbose:
