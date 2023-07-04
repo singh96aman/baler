@@ -9,8 +9,8 @@ def set_config(c):
     c.min_delta = 0
     c.lr_scheduler = True
     c.lr_scheduler_patience = 50
-    c.model_name = "CFD_dense_AE"
-    c.model_type = "dense"
+    c.model_name = "Conv_AE_3D"
+    c.model_type = "convolutional"
     c.custom_norm = True
     c.l1 = True
     c.reg_param = 0.001
@@ -25,7 +25,7 @@ def set_config(c):
     c.intermittent_saving_patience = 100
     c.activation_extraction = False
     c.deterministic_algorithm = False
-    c.compress_to_latent_space = False
+    c.compress_to_latent_space = True
 
 
 # def set_config(c):

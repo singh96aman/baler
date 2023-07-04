@@ -358,7 +358,7 @@ class Conv_AE_3D(nn.Module):
         super(Conv_AE_3D, self).__init__(*args, **kwargs)
 
         self.q_z_mid_dim = 2000
-        self.q_z_output_dim = 0  # Please change this to 4800000
+        self.q_z_output_dim = 4800000  # Please change this to 4800000
         self.compress_to_latent_space = False
 
         # Encoder
